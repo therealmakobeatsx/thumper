@@ -23,7 +23,7 @@ for executable in "${executables[@]}"; do
         exit 1
     fi
 
-    lipo -verify_arch arm64 x86_64 "$executable"
+    lipo "$executable" -verify_arch arm64 x86_64
 done
 
 au_install_dir="$HOME/Library/Audio/Plug-Ins/Components/THUMPER.component"

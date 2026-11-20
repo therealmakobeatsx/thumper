@@ -105,12 +105,15 @@ if(APPLE)
     set(THUMPER_MACOS_ARTEFACT_DIR "${CMAKE_BINARY_DIR}/THUMPER_artefacts/$<CONFIG>")
 
     add_custom_target(THUMPER_macOS_package
-        COMMAND "${THUMPER_LIPO_EXECUTABLE}" -verify_arch arm64 x86_64
+        COMMAND "${THUMPER_LIPO_EXECUTABLE}"
                 "${THUMPER_MACOS_ARTEFACT_DIR}/AU/THUMPER.component/Contents/MacOS/THUMPER"
-        COMMAND "${THUMPER_LIPO_EXECUTABLE}" -verify_arch arm64 x86_64
+                -verify_arch arm64 x86_64
+        COMMAND "${THUMPER_LIPO_EXECUTABLE}"
                 "${THUMPER_MACOS_ARTEFACT_DIR}/VST3/THUMPER.vst3/Contents/MacOS/THUMPER"
-        COMMAND "${THUMPER_LIPO_EXECUTABLE}" -verify_arch arm64 x86_64
+                -verify_arch arm64 x86_64
+        COMMAND "${THUMPER_LIPO_EXECUTABLE}"
                 "${THUMPER_MACOS_ARTEFACT_DIR}/Standalone/THUMPER.app/Contents/MacOS/THUMPER"
+                -verify_arch arm64 x86_64
         COMMAND "${CMAKE_COMMAND}" -E rm -rf "${THUMPER_MACOS_PACKAGE_DIR}"
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${THUMPER_MACOS_PACKAGE_DIR}"
         COMMAND "${CMAKE_COMMAND}" -E copy_directory
