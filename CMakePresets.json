@@ -1,0 +1,38 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "macos-universal-release",
+      "displayName": "THUMPER macOS Universal Release",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/macos-universal-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "THUMPER_MACOS_UNIVERSAL": "ON",
+        "BUILD_TESTING": "OFF"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "macos-universal-release",
+      "displayName": "Build THUMPER AU, VST3, Standalone and ZIP",
+      "configurePreset": "macos-universal-release",
+      "configuration": "Release",
+      "targets": [
+        "THUMPER_macOS_package"
+      ]
+    }
+  ]
+}

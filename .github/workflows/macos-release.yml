@@ -1,0 +1,62 @@
+name: macOS Universal Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and verify macOS Universal Release
+    runs-on: macos-15
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Show Apple build tools
+        run: |
+          xcodebuild -version
+          cmake --version
+
+      - name: Build, package, and verify
+        run: bash scripts/build-macos-release.sh
+
+      - name: Upload macOS package
+        uses: actions/upload-artifact@v4
+        with:
+          name: THUMPER-macOS-${{ github.ref_name }}
+          path: build/macos-universal-release/THUMPER-macOS.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+  publish:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out release scripts
+        uses: actions/checkout@v4
+
+      - name: Download macOS package
+        uses: actions/download-artifact@v4
+        with:
+          name: THUMPER-macOS-${{ github.ref_name }}
+          path: dist
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/publish-github-release.sh "$GITHUB_REF_NAME" dist/THUMPER-macOS.zip
