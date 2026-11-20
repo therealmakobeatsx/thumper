@@ -35,6 +35,9 @@ fi
 mkdir -p "$(dirname "$au_install_dir")"
 ditto "$artefact_dir/AU/THUMPER.component" "$au_install_dir"
 trap 'rm -rf "$au_install_dir"' EXIT
+plutil -p "$au_install_dir/Contents/Info.plist"
+au_components="$(auval -a)"
+grep -Ei 'THUMPER|Thmp' <<< "$au_components" || true
 auval -v aufx Thmp Thmp
 
 if [[ ! -s "$archive" ]]; then
