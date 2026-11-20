@@ -126,10 +126,8 @@ if(APPLE)
                 "${THUMPER_MACOS_ARTEFACT_DIR}/Standalone/THUMPER.app"
                 "${THUMPER_MACOS_PACKAGE_DIR}/THUMPER.app"
         COMMAND "${CMAKE_COMMAND}" -E rm -f "${CMAKE_BINARY_DIR}/THUMPER-macOS.zip"
-        COMMAND "${THUMPER_DITTO_EXECUTABLE}" -c -k --sequesterRsrc --keepParent
-                "${THUMPER_MACOS_PACKAGE_DIR}/THUMPER.component"
-                "${THUMPER_MACOS_PACKAGE_DIR}/THUMPER.vst3"
-                "${THUMPER_MACOS_PACKAGE_DIR}/THUMPER.app"
+        COMMAND "${THUMPER_DITTO_EXECUTABLE}" -c -k --sequesterRsrc
+                "${THUMPER_MACOS_PACKAGE_DIR}"
                 "${CMAKE_BINARY_DIR}/THUMPER-macOS.zip"
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         DEPENDS THUMPER_AU THUMPER_VST3 THUMPER_Standalone
