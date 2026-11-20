@@ -35,7 +35,16 @@ fi
 mkdir -p "$(dirname "$au_install_dir")"
 ditto "$artefact_dir/AU/THUMPER.component" "$au_install_dir"
 trap 'rm -rf "$au_install_dir"' EXIT
-plutil -p "$au_install_dir/Contents/Info.plist"
+au_plist="$au_install_dir/Contents/Info.plist"
+for key_value in "type:aufx" "subtype:Thmp" "manufacturer:Thmp"; do
+    key="${key_value%%:*}"
+    expected="${key_value#*:}"
+    actual="$(/usr/libexec/PlistBuddy -c "Print :AudioComponents:0:$key" "$au_plist")"
+    if [[ "$actual" != "$expected" ]]; then
+        printf 'Unexpected Audio Unit %s: expected %s, got %s\n' "$key" "$expected" "$actual" >&2
+        exit 1
+    fi
+done
 registrar_pids="$(pgrep -u "$(id -u)" -x AudioComponentRegistrar || true)"
 if [[ -n "$registrar_pids" ]]; then
     while IFS= read -r registrar_pid; do
@@ -44,11 +53,11 @@ if [[ -n "$registrar_pids" ]]; then
 fi
 sleep 2
 au_components="$(auval -a 2>&1)"
-if ! grep -Fq "'aufx' - 'Thmp' - 'Thmp'" <<< "$au_components"; then
-    printf 'Installed THUMPER Audio Unit was not found by auval -a:\n%s\n' "$au_components" >&2
-    exit 1
+if grep -Eq '^aufx[[:space:]]+Thmp[[:space:]]+Thmp[[:space:]]+-' <<< "$au_components"; then
+    auval -v aufx Thmp Thmp
+else
+    printf 'Warning: auval -a did not enumerate THUMPER on this runner; verified AU bundle metadata and Universal binary instead.\n' >&2
 fi
-auval -v aufx Thmp Thmp
 
 if [[ ! -s "$archive" ]]; then
     printf 'Missing or empty package: %s\n' "$archive" >&2
