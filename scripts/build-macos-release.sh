@@ -36,8 +36,18 @@ mkdir -p "$(dirname "$au_install_dir")"
 ditto "$artefact_dir/AU/THUMPER.component" "$au_install_dir"
 trap 'rm -rf "$au_install_dir"' EXIT
 plutil -p "$au_install_dir/Contents/Info.plist"
-au_components="$(auval -a)"
-grep -Ei 'THUMPER|Thmp' <<< "$au_components" || true
+registrar_pids="$(pgrep -u "$(id -u)" -x AudioComponentRegistrar || true)"
+if [[ -n "$registrar_pids" ]]; then
+    while IFS= read -r registrar_pid; do
+        kill "$registrar_pid"
+    done <<< "$registrar_pids"
+fi
+sleep 2
+au_components="$(auval -a 2>&1)"
+if ! grep -Fq "'aufx' - 'Thmp' - 'Thmp'" <<< "$au_components"; then
+    printf 'Installed THUMPER Audio Unit was not found by auval -a:\n%s\n' "$au_components" >&2
+    exit 1
+fi
 auval -v aufx Thmp Thmp
 
 if [[ ! -s "$archive" ]]; then
